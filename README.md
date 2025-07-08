@@ -74,6 +74,7 @@ npm run build   # Build for production
 4. Test by asking Claude to search your journal entries
 
 Example prompts:
-- "Show me my journal entries from last week"
-- "What tags am I using in my journal?"
-- "Show me statistics about my journal"
+- "Use jrnl to show me my journal entries from last week"
+- "Using jrnl, what tags am I using in my journal?"
+- "Can you use jrnl to show me statistics about my journal?"
+- "Search my journal entries for entries tagged with @work using jrnl"
