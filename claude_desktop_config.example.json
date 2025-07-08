@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "jrnl": {
+      "command": "jrnl-mcp"
+    }
+  }
+}
