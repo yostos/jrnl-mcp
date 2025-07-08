@@ -1,5 +1,10 @@
 # jrnl MCP Server
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+[![Claude](https://img.shields.io/badge/Claude-MCP-blue)](https://claude.ai)
+[![jrnl](https://img.shields.io/badge/jrnl-CLI-orange)](https://jrnl.sh/)
+
 A Model Context Protocol (MCP) server that provides read-only access to jrnl (command-line journal) entries.
 
 ## Prerequisites
