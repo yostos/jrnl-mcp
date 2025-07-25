@@ -7,6 +7,10 @@
 
 A Model Context Protocol (MCP) server that provides read-only access to jrnl (command-line journal) entries.
 
+<a href="https://glama.ai/mcp/servers/@yostos/jrnl-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@yostos/jrnl-mcp/badge" alt="jrnl Server MCP server" />
+</a>
+
 ## Prerequisites
 
 - Node.js 18 or higher
