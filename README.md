@@ -71,6 +71,49 @@ npm test        # Run tests
 npm run build   # Build for production
 ```
 
+## Publishing
+
+This package uses GitHub Actions with npm Trusted Publishing (OIDC) for automated publishing. **No npm tokens required!**
+
+### Initial Setup (One-time)
+
+Configure npm Trusted Publishing for this package:
+
+1. Go to https://www.npmjs.com/package/jrnl-mcp/access
+2. Click "Publishing access" or "Trusted publishers"
+3. Add a new trusted publisher:
+   - **Provider**: GitHub Actions
+   - **Repository owner**: yostos
+   - **Repository name**: jrnl-mcp
+   - **Workflow name**: publish.yml
+   - **Environment**: (leave blank)
+
+### Publishing a New Version
+
+1. Update the version in `package.json`:
+   ```bash
+   npm version patch  # or minor, or major
+   ```
+
+2. Push the version commit and tag to GitHub:
+   ```bash
+   git push && git push --tags
+   ```
+
+3. Create a new release on GitHub:
+   - Go to https://github.com/yostos/jrnl-mcp/releases
+   - Click "Draft a new release"
+   - Select the tag you just pushed
+   - Add release notes
+   - Click "Publish release"
+
+4. GitHub Actions will automatically:
+   - Run tests
+   - Build the package
+   - Publish to npm with provenance (using OIDC, no tokens needed!)
+
+The published package will have attestations that prove it was built from your GitHub repository.
+
 ## Testing with Claude Desktop
 
 1. Build the project: `npm run build`

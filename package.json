@@ -35,6 +35,10 @@
   "bugs": {
     "url": "https://github.com/yostos/jrnl-mcp/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
     "date-fns": "^2.30.0"
