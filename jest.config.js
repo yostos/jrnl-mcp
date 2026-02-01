@@ -14,6 +14,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   testTimeout: 10000, // 10 seconds for integration tests
   // Run tests in specific order: unit tests first, then integration tests

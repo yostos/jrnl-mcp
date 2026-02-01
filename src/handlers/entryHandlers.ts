@@ -1,5 +1,7 @@
-import { JrnlExecutor } from "../utils/jrnlExecutor";
-import { buildSearchCommand, SearchFilters } from "../utils/commandBuilder";
+import { JrnlExecutor } from "../utils/jrnlExecutor.js";
+import { buildSearchCommand, SearchFilters } from "../utils/commandBuilder.js";
+import { JrnlExecutionError } from "../errors/index.js";
+import { JrnlEntry } from "../types/jrnl.js";
 
 export interface JournalEntry {
   date: string;
@@ -37,10 +39,13 @@ export async function searchEntries(
   const result = await executor.execute(command);
 
   try {
-    const data = JSON.parse(result);
+    const data = JSON.parse(result) as {
+      entries: JrnlEntry[];
+      tags: Record<string, number>;
+    };
 
     // jrnl exports in a specific format, need to transform it
-    const entries: JournalEntry[] = data.entries.map((entry: any) => ({
+    const entries: JournalEntry[] = data.entries.map((entry: JrnlEntry) => ({
       date: entry.date,
       time: entry.time || "",
       title: entry.title || "",
@@ -54,6 +59,11 @@ export async function searchEntries(
       tags: data.tags || {},
     };
   } catch (error) {
-    throw new Error(`Failed to parse jrnl output: ${error}`);
+    if (error instanceof JrnlExecutionError) {
+      throw error;
+    }
+    throw new JrnlExecutionError(
+      `Failed to parse jrnl output: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }

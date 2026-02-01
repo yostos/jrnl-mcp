@@ -1,5 +1,10 @@
-import { JrnlExecutor } from "../utils/jrnlExecutor";
-import { buildTagCommand, buildSearchCommand } from "../utils/commandBuilder";
+import { JrnlExecutor } from "../utils/jrnlExecutor.js";
+import {
+  buildTagCommand,
+  buildSearchCommand,
+} from "../utils/commandBuilder.js";
+import { JrnlExecutionError } from "../errors/index.js";
+import { logDebug } from "../utils/logger.js";
 
 export interface TagInfo {
   tag: string;
@@ -34,7 +39,12 @@ export async function listTags(
 
     return { tags };
   } catch (error) {
-    throw new Error(`Failed to parse jrnl tags output: ${error}`);
+    if (error instanceof JrnlExecutionError) {
+      throw error;
+    }
+    throw new JrnlExecutionError(
+      `Failed to parse jrnl tags output: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -71,8 +81,11 @@ export async function analyzeTagCooccurrence(
           });
         }
       } catch (error) {
-        // Skip this pair if there's an error
-        // console.error(`Error analyzing cooccurrence for ${tag1} and ${tag2}: ${error}`);
+        // Skip this pair if there's an error, but log for debugging
+        logDebug(
+          `Error analyzing cooccurrence for ${tag1} and ${tag2}: ${error}`,
+          "analyzeTagCooccurrence",
+        );
       }
     }
   }
