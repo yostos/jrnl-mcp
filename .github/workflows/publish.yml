@@ -21,6 +21,20 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install jrnl
+        run: pip install jrnl
+
+      - name: Setup jrnl config
+        run: |
+          mkdir -p ~/.config/jrnl
+          echo '{"journals": {"default": {"journal": "/tmp/test.jrnl"}}, "version": "v4"}' > ~/.config/jrnl/jrnl.yaml
+          echo "2024-01-01 10:00 Test entry @test" > /tmp/test.jrnl
+
       - name: Install dependencies
         run: npm ci
 
