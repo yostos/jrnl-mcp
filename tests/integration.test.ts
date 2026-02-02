@@ -367,7 +367,9 @@ describe("jrnl MCP Server Integration Tests", () => {
           const result = JSON.parse(response.result.content[0].text);
           expect(result.tags).toBeDefined();
           expect(typeof result.tags).toBe("object");
-          expect(result.tags["@ciac"]).toBeGreaterThan(0);
+          // Check that at least one tag exists (environment-independent)
+          const tagKeys = Object.keys(result.tags);
+          expect(tagKeys.length).toBeGreaterThan(0);
 
           done();
         });
