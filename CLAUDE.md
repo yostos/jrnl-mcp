@@ -57,7 +57,7 @@ When implementing this specification:
 - Implement input validation to prevent command injection
 - Never allow write operations to maintain data safety
 - Handle jrnl encryption transparently
-- Consider caching for performance with large journals
+- Caching was considered but rejected (see ADR-002)
 
 ## Security Constraints
 
@@ -99,36 +99,22 @@ When making changes, always run these commands in order:
 - Integration tests: Test MCP protocol communication and tool execution
 - All tests must pass before committing changes
 
-## Current Status (2026-02-01)
+## Current Status (2026-02-02)
 
-**Phase 1 Progress**: ✅ **COMPLETED**
+**Phase 1**: ✅ **COMPLETED** (2026-02-01)
+**Phase 2**: ✅ **COMPLETED** (2026-02-02)
 
-✅ **Completed (2026-02-01)**:
-1. Dependency updates (minor versions)
-   - MCP SDK: 1.13.2 → 1.25.3
-   - TypeScript, Prettier, ts-jest updated
-   - date-fns removed (unused dependency)
-2. Error handling infrastructure
-   - Custom error classes created (`src/errors/index.ts`)
-   - Logger utilities enhanced (`src/utils/logger.ts`)
-3. Error handling implementation
-   - Updated `src/utils/jrnlExecutor.ts` with custom errors and logger
-   - Updated `src/handlers/*.ts` with custom error classes
-   - Updated `src/index.ts` with logger functions
-   - Fixed Jest config for ESM imports
-4. Test improvements
-   - Added error case tests (`tests/error-cases.test.ts`)
-   - Added test fixtures (`tests/fixtures/`, `tests/helpers/mockData.ts`)
-   - Test count: 26 → 50
-5. Code cleanup
-   - Type definitions created (`src/types/jrnl.ts`)
-   - All `any` types eliminated from src/
-   - Replaced with proper types (`JrnlEntry`, `unknown`)
+✅ **Completed (Phase 2)**:
+1. Jest 30 upgrade (29.7.0 → 30.2.0)
+2. ESLint 9 upgrade (Flat Config migration)
+3. Architecture documentation (`docs/ARCHITECTURE.md`)
 
-🚧 **Next Phase (Phase 2)**:
-- Jest 30 upgrade
-- ESLint 9 upgrade (Flat Config migration)
-- See `docs/roadmap.md` for details
+**Decisions** (see `docs/ARCHITECTURE_DECISIONS.md`):
+- Caching → Rejected (ADR-002)
+- ESModules migration → Rejected (ADR-003)
+- Documentation & DX → Deferred (ADR-004)
+
+🚧 **Next**: Phase 3 (see `docs/roadmap.md`)
 
 ---
 

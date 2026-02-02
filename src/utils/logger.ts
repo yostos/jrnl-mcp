@@ -131,7 +131,7 @@ export class MCPLogger {
       }
 
       await this.server.sendLoggingMessage(params);
-    } catch (error) {
+    } catch {
       // If logging fails, we can't log the error!
       // In production, you might want to write to a file as a fallback
     }

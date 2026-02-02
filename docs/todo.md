@@ -547,6 +547,58 @@ Phase 1 のすべてのタスクが完了しました：
 
 ---
 
+## 📝 Phase 2 作業ログ
+
+> Phase 2 の実施内容を日時と結果とともに記録します。
+
+### 2026-02-02
+
+#### 10:00 - Jest 30 アップグレード ✅
+
+**実施内容:**
+- `jest`: 29.7.0 → 30.2.0 にアップグレード
+- `@types/jest`: 29.5.5 → 30.0.0 にアップグレード
+- ts-jest 29.4.6 は Jest 30 と互換性あり（そのまま使用）
+
+**結果:**
+- ✅ ビルド成功: `npm run build` エラーなし
+- ✅ テスト成功: 50/50 テストがパス
+- ✅ Lint成功: `npm run lint` エラーなし
+
+**備考:**
+- Node.js 25.2.1 環境で動作確認済み
+- `--localstorage-file` 警告はNode.js 25の新機能に関するもの（テストには影響なし）
+- ts-jest は Jest 30 に正式対応していないが、現時点では問題なく動作
+
+---
+
+#### 10:30 - ESLint 9 アップグレード（Flat Config 移行）✅
+
+**実施内容:**
+1. パッケージの更新:
+   - 削除: `@typescript-eslint/eslint-plugin`, `@typescript-eslint/parser`
+   - 追加: `eslint@^9.39.2`, `typescript-eslint@^8.54.0`, `@eslint/js@^9.39.2`, `globals@^17.3.0`
+
+2. 設定ファイルの移行:
+   - `.eslintrc.js` を削除
+   - `eslint.config.mjs` を新規作成（Flat Config 形式）
+
+3. コード修正:
+   - `src/utils/logger.ts`: 空の catch ブロックに変更（unused variable エラー回避）
+
+**結果:**
+- ✅ ビルド成功: `npm run build` エラーなし
+- ✅ テスト成功: 50/50 テストがパス
+- ✅ Lint成功: `npm run lint` エラーなし
+- ✅ 脆弱性: 9件 → 0件（依存関係の更新により解消）
+
+**備考:**
+- Flat Config は ESLint 9 の新しい設定形式
+- `typescript-eslint` パッケージは v8 から統合パッケージに変更
+- `eslint.config.mjs` は ES モジュール形式で記述
+
+---
+
 ## 🔄 次回作業開始時の確認事項
 
 次回このプロジェクトの作業を再開する際は、以下を確認してください：
@@ -558,36 +610,34 @@ Phase 1 のすべてのタスクが完了しました：
 - 📋 次にやるべきことは何か
 
 ### 2️⃣ 現在の状態を把握
-**Phase 1の進捗状況（2026-02-01時点）**: ✅ **完了**
+**Phase 2の進捗状況（2026-02-02時点）**: 🚧 **進行中**
 
-✅ **完了済み**:
-1. 依存関係の更新（マイナーアップデート）
-   - MCP SDK 1.25.3、TypeScript 5.9.3、Prettier 3.8.1など
-   - date-fns削除（未使用）
-2. メジャーアップデートの調査
-   - jest 30、eslint 9 → Phase 2に延期
-3. エラーハンドリングの基盤整備
-   - カスタムエラークラス作成完了（`src/errors/index.ts`）
-   - Logger拡張完了（`src/utils/logger.ts`）
-4. **エラーハンドリングの実装**
-   - `src/utils/jrnlExecutor.ts` 更新完了
-   - `src/handlers/*.ts` 更新完了
-   - `src/index.ts` 更新完了
-   - Jest設定修正完了
-5. **テストの改善**
-   - エラーケーステスト追加（`tests/error-cases.test.ts`）
-   - 統合テスト拡充（limit, starred, timeGrouping, includeTopTags）
-   - テストフィクスチャ整備（`tests/fixtures/`, `tests/helpers/mockData.ts`）
-   - テスト数: 26 → 50
-6. **コードクリーンアップ**
-   - 型定義ファイル作成（`src/types/jrnl.ts`）
-   - `any` 型完全排除
-   - `unknown` 型への移行
+✅ **Phase 1 完了済み** (2026-02-01):
+- 依存関係の更新、エラーハンドリング、テスト改善、コードクリーンアップ
 
-🚧 **次にやること（Phase 2）**:
-- jest 30 へのアップグレード
-- eslint 9 へのアップグレード（Flat Config 移行）
-- 詳細は `docs/roadmap.md` を参照
+✅ **Phase 2 完了済み** (2026-02-02):
+1. Jest 30 アップグレード
+   - jest: 29.7.0 → 30.2.0
+   - @types/jest: 29.5.5 → 30.0.0
+2. ESLint 9 アップグレード（Flat Config 移行）
+   - eslint: 8.50.0 → 9.39.2
+   - typescript-eslint: 6.x → 8.54.0
+   - `.eslintrc.js` → `eslint.config.mjs` に移行
+   - 脆弱性: 9件 → 0件
+
+✅ **Phase 2 完了**
+
+**実施済み**:
+- Jest 30 アップグレード
+- ESLint 9 アップグレード（Flat Config 移行）
+- アーキテクチャドキュメント作成（`docs/ARCHITECTURE.md`）
+
+**決定事項**（`docs/ARCHITECTURE_DECISIONS.md` 参照）:
+- ~~キャッシング機能~~ → 却下（ADR-002）
+- ~~ESModules移行~~ → 却下（ADR-003）
+- ドキュメント・開発体験 → 保留（ADR-004）
+
+🚧 **次にやること**: Phase 3（`docs/roadmap.md` 参照）
 
 ### 3️⃣ 全体像を確認
 大きな計画を確認したい場合は `docs/roadmap.md` を参照：
@@ -598,7 +648,7 @@ Phase 1 のすべてのタスクが完了しました：
 ### 4️⃣ 環境確認
 作業開始前に環境をチェック：
 ```bash
-npm test      # 全テストがパスすることを確認（26/26）
+npm test      # 全テストがパスすることを確認（50/50）
 npm run build # ビルドが通ることを確認
 npm run lint  # Lintエラーがないことを確認
 ```
