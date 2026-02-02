@@ -1,0 +1,66 @@
+{
+  "tags": {
+    "@work": 5,
+    "@personal": 3,
+    "@meeting": 2,
+    "@idea": 1
+  },
+  "entries": [
+    {
+      "date": "2024-01-15",
+      "time": "09:00",
+      "title": "Morning standup meeting",
+      "body": "Discussed project progress with the team. @work @meeting",
+      "tags": ["@work", "@meeting"],
+      "starred": false
+    },
+    {
+      "date": "2024-01-15",
+      "time": "14:30",
+      "title": "New feature idea",
+      "body": "Had an interesting idea about improving the search functionality. @work @idea",
+      "tags": ["@work", "@idea"],
+      "starred": true
+    },
+    {
+      "date": "2024-01-14",
+      "time": "20:00",
+      "title": "Evening reflection",
+      "body": "Spent time reading and relaxing after work. @personal",
+      "tags": ["@personal"],
+      "starred": false
+    },
+    {
+      "date": "2024-01-13",
+      "time": "10:00",
+      "title": "Weekly review meeting",
+      "body": "Reviewed last week's accomplishments and set goals for the coming week. @work @meeting",
+      "tags": ["@work", "@meeting"],
+      "starred": false
+    },
+    {
+      "date": "2024-01-12",
+      "time": "18:00",
+      "title": "Dinner with friends",
+      "body": "Had a great time catching up with old friends. @personal",
+      "tags": ["@personal"],
+      "starred": true
+    },
+    {
+      "date": "2024-01-11",
+      "time": "09:30",
+      "title": "Project kickoff",
+      "body": "Started working on the new MCP integration project. @work",
+      "tags": ["@work"],
+      "starred": false
+    },
+    {
+      "date": "2024-01-10",
+      "time": "21:00",
+      "title": "Reading notes",
+      "body": "Finished reading an interesting book about software architecture. @personal",
+      "tags": ["@personal"],
+      "starred": false
+    }
+  ]
+}

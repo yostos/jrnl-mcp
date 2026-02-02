@@ -2,6 +2,8 @@
  * Utility for executing jrnl CLI commands and parsing results
  */
 import { spawn } from "child_process";
+import { JrnlNotFoundError, JrnlExecutionError } from "../errors/index.js";
+import { logError, logDebug } from "./logger.js";
 
 /**
  * Options for executing a jrnl command
@@ -91,10 +93,11 @@ export async function executeJrnlCommand(
       }
     });
 
-    // Handle errors
+    // Handle errors (e.g., jrnl command not found)
     process.on("error", (err) => {
       if (timeoutId) clearTimeout(timeoutId);
       if (!killed) {
+        logDebug(`jrnl process error: ${err.message}`, "jrnlExecutor");
         resolve({
           stdout,
           stderr: stderr + "\n" + err.message,
@@ -115,10 +118,12 @@ export function parseJrnlJsonOutput<T>(output: string): T {
   try {
     return JSON.parse(output.trim()) as T;
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Failed to parse jrnl output as JSON: ${error.message}`);
-    }
-    throw error;
+    const message =
+      error instanceof Error
+        ? `Failed to parse jrnl output as JSON: ${error.message}`
+        : "Failed to parse jrnl output as JSON";
+    logError(error, "parseJrnlJsonOutput");
+    throw new JrnlExecutionError(message);
   }
 }
 
@@ -142,7 +147,14 @@ export async function executeJrnlJsonCommand<T>(
   const result = await executeJrnlCommand(commandArgs, options);
 
   if (!result.success) {
-    throw new Error(`jrnl command failed: ${result.stderr}`);
+    // Check if jrnl command was not found
+    if (
+      result.stderr.includes("ENOENT") ||
+      result.stderr.includes("not found")
+    ) {
+      throw new JrnlNotFoundError();
+    }
+    throw new JrnlExecutionError(`jrnl command failed: ${result.stderr}`);
   }
 
   return parseJrnlJsonOutput<T>(result.stdout);
@@ -150,13 +162,23 @@ export async function executeJrnlJsonCommand<T>(
 
 export class JrnlExecutor {
   async execute(args: string[]): Promise<string> {
+    logDebug(`Executing jrnl with args: ${args.join(" ")}`, "JrnlExecutor");
     const result = await executeJrnlCommand(args);
+
     if (!result.success) {
-      throw new Error(`jrnl command failed: ${result.stderr}`);
+      // Check if jrnl command was not found
+      if (
+        result.stderr.includes("ENOENT") ||
+        result.stderr.includes("not found")
+      ) {
+        throw new JrnlNotFoundError();
+      }
+      throw new JrnlExecutionError(`jrnl command failed: ${result.stderr}`);
     }
 
     // Clean jrnl output - remove decorative boxes and extra text
     const cleaned = this.cleanJrnlOutput(result.stdout);
+    logDebug(`jrnl output cleaned, length: ${cleaned.length}`, "JrnlExecutor");
 
     return cleaned;
   }

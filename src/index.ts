@@ -16,6 +16,8 @@ import {
   setJournal,
   getCurrentJournal,
 } from "./handlers/journalHandlers.js";
+import { logError, logInfo } from "./utils/logger.js";
+import { JrnlMcpError } from "./errors/index.js";
 
 const server = new Server(
   {
@@ -246,15 +248,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error(`Unknown tool: ${name}`);
     }
   } catch (error) {
-    // Log errors to stderr for debugging
-    process.stderr.write(
-      `[${new Date().toISOString()}] Error in tool ${name}: ${error instanceof Error ? error.message : String(error)}\n`,
-    );
+    logError(error, `tool:${name}`);
+
+    // Provide user-friendly error messages based on error type
+    let errorMessage: string;
+    if (error instanceof JrnlMcpError) {
+      errorMessage = `${error.code}: ${error.message}`;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = String(error);
+    }
+
     return {
       content: [
         {
           type: "text",
-          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+          text: `Error: ${errorMessage}`,
         },
       ],
     };
@@ -265,21 +275,14 @@ async function main() {
   try {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    // Server started - logging to stderr for debugging
-    process.stderr.write(
-      `[${new Date().toISOString()}] jrnl MCP server started\n`,
-    );
+    logInfo("jrnl MCP server started", "main");
   } catch (error) {
-    process.stderr.write(
-      `[${new Date().toISOString()}] Failed to start MCP server: ${error}\n`,
-    );
+    logError(error, "main:startup");
     process.exit(1);
   }
 }
 
 main().catch((error) => {
-  process.stderr.write(
-    `[${new Date().toISOString()}] Server error: ${error}\n`,
-  );
+  logError(error, "main:unhandled");
   process.exit(1);
 });

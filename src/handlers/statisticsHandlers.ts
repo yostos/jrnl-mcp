@@ -1,6 +1,8 @@
-import { JrnlExecutor } from "../utils/jrnlExecutor";
-import { buildStatsCommand } from "../utils/commandBuilder";
-import { parseTimeGrouping } from "../utils/dateUtils";
+import { JrnlExecutor } from "../utils/jrnlExecutor.js";
+import { buildStatsCommand } from "../utils/commandBuilder.js";
+import { parseTimeGrouping } from "../utils/dateUtils.js";
+import { JrnlExecutionError } from "../errors/index.js";
+import { JrnlEntry } from "../types/jrnl.js";
 
 export interface TimeGroupStats {
   period: string;
@@ -31,11 +33,14 @@ export async function getStatistics(
 
     // Calculate basic statistics
     const totalEntries = entries.length;
-    const totalWords = entries.reduce((sum: number, entry: any) => {
-      const bodyWords = entry.body ? entry.body.split(/\s+/).length : 0;
-      const titleWords = entry.title ? entry.title.split(/\s+/).length : 0;
-      return sum + bodyWords + titleWords;
-    }, 0);
+    const totalWords = (entries as JrnlEntry[]).reduce(
+      (sum: number, entry: JrnlEntry) => {
+        const bodyWords = entry.body ? entry.body.split(/\s+/).length : 0;
+        const titleWords = entry.title ? entry.title.split(/\s+/).length : 0;
+        return sum + bodyWords + titleWords;
+      },
+      0,
+    );
 
     const averageWordsPerEntry =
       totalEntries > 0 ? Math.round(totalWords / totalEntries) : 0;
@@ -49,21 +54,24 @@ export async function getStatistics(
     // Time grouping statistics
     if (timeGrouping) {
       const grouping = parseTimeGrouping(timeGrouping);
-      const grouped = groupEntriesByTime(entries, grouping);
+      const grouped = groupEntriesByTime(entries as JrnlEntry[], grouping);
 
       statistics.timeGrouping = Object.entries(grouped).map(
-        ([period, entries]) => {
-          const wordCount = entries.reduce((sum: number, entry: any) => {
-            const bodyWords = entry.body ? entry.body.split(/\s+/).length : 0;
-            const titleWords = entry.title
-              ? entry.title.split(/\s+/).length
-              : 0;
-            return sum + bodyWords + titleWords;
-          }, 0);
+        ([period, groupedEntries]) => {
+          const wordCount = groupedEntries.reduce(
+            (sum: number, entry: JrnlEntry) => {
+              const bodyWords = entry.body ? entry.body.split(/\s+/).length : 0;
+              const titleWords = entry.title
+                ? entry.title.split(/\s+/).length
+                : 0;
+              return sum + bodyWords + titleWords;
+            },
+            0,
+          );
 
           return {
             period,
-            entryCount: entries.length,
+            entryCount: groupedEntries.length,
             wordCount,
           };
         },
@@ -74,7 +82,7 @@ export async function getStatistics(
     if (includeTopTags) {
       const tagCounts = new Map<string, number>();
 
-      entries.forEach((entry: any) => {
+      (entries as JrnlEntry[]).forEach((entry: JrnlEntry) => {
         if (entry.tags) {
           entry.tags.forEach((tag: string) => {
             const normalizedTag = tag.startsWith("@") ? tag : `@${tag}`;
@@ -94,17 +102,22 @@ export async function getStatistics(
 
     return { statistics };
   } catch (error) {
-    throw new Error(`Failed to calculate statistics: ${error}`);
+    if (error instanceof JrnlExecutionError) {
+      throw error;
+    }
+    throw new JrnlExecutionError(
+      `Failed to calculate statistics: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
 function groupEntriesByTime(
-  entries: any[],
+  entries: JrnlEntry[],
   grouping: string,
-): Record<string, any[]> {
-  const grouped: Record<string, any[]> = {};
+): Record<string, JrnlEntry[]> {
+  const grouped: Record<string, JrnlEntry[]> = {};
 
-  entries.forEach((entry: any) => {
+  entries.forEach((entry: JrnlEntry) => {
     const date = new Date(entry.date);
     let key: string;
 

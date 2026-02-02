@@ -11,6 +11,8 @@ A Model Context Protocol (MCP) server that provides read-only access to jrnl (co
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@yostos/jrnl-mcp/badge" alt="jrnl Server MCP server" />
 </a>
 
+> **[Architecture Documentation](docs/ARCHITECTURE.md)** - System design and component overview
+
 ## Prerequisites
 
 - Node.js 18 or higher

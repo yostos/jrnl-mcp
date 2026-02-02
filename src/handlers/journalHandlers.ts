@@ -1,5 +1,6 @@
-import { JrnlExecutor } from "../utils/jrnlExecutor";
-import { buildListJournalsCommand } from "../utils/commandBuilder";
+import { JrnlExecutor } from "../utils/jrnlExecutor.js";
+import { buildListJournalsCommand } from "../utils/commandBuilder.js";
+import { JrnlExecutionError } from "../errors/index.js";
 
 export interface JournalInfo {
   name: string;
@@ -53,7 +54,12 @@ export async function listJournals(
       currentJournal,
     };
   } catch (error) {
-    throw new Error(`Failed to parse journal list: ${error}`);
+    if (error instanceof JrnlExecutionError) {
+      throw error;
+    }
+    throw new JrnlExecutionError(
+      `Failed to parse journal list: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 

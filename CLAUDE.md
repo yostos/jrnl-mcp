@@ -2,11 +2,32 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 📋 Work Tracking - START HERE
+
+**IMPORTANT**: Before starting any work, check these documents in order:
+
+1. **`docs/roadmap.md`** - 3-phase improvement plan (Phase 1 → Phase 2 → Phase 3)
+   - Overview of all planned improvements
+   - Categorized by priority (high/medium/low)
+   - Helps understand the big picture
+
+2. **`docs/todo.md`** - Detailed Phase 1 tasks with work logs
+   - **Most important for day-to-day work**
+   - Detailed task breakdowns with checkboxes
+   - Work logs with timestamps and results
+   - Next person reads this to continue work
+
+3. **This file (CLAUDE.md)** - Project overview and guidelines
+   - Architecture and implementation requirements
+   - Development guidelines and best practices
+
+---
+
 ## Project Overview
 
 This is a jrnl MCP (Model Context Protocol) server that provides a read-only API for AI assistants to access and analyze journal entries from the jrnl command-line tool.
 
-**Current State**: Fully implemented with comprehensive test coverage.
+**Current State**: Phase 1 improvements in progress (see `docs/todo.md` for details).
 
 ## Architecture
 
@@ -36,7 +57,7 @@ When implementing this specification:
 - Implement input validation to prevent command injection
 - Never allow write operations to maintain data safety
 - Handle jrnl encryption transparently
-- Consider caching for performance with large journals
+- Caching was considered but rejected (see ADR-002)
 
 ## Security Constraints
 
@@ -78,22 +99,41 @@ When making changes, always run these commands in order:
 - Integration tests: Test MCP protocol communication and tool execution
 - All tests must pass before committing changes
 
-## Current Status (2025-07-01)
+## Current Status (2026-02-02)
 
-### Completed Tasks ✅
-- ✅ 統合テストの追加と修正（search_entries、list_tags、get_statistics、analyze_tag_cooccurrence）
-- ✅ 実装の修正（JSON/プレーンテキスト処理）
-- ✅ デバッグログの削除とstderrへの適切なログ出力
-- ✅ コードフォーマットとlintの実行
-- ✅ npm linkでグローバルインストール
-- ✅ すべてのテストが通ることを確認
+**Phase 1**: ✅ **COMPLETED** (2026-02-01)
+**Phase 2**: ✅ **COMPLETED** (2026-02-02)
+
+✅ **Completed (Phase 2)**:
+1. Jest 30 upgrade (29.7.0 → 30.2.0)
+2. ESLint 9 upgrade (Flat Config migration)
+3. Architecture documentation (`docs/ARCHITECTURE.md`)
+
+**Decisions** (see `docs/ARCHITECTURE_DECISIONS.md`):
+- Caching → Rejected (ADR-002)
+- ESModules migration → Rejected (ADR-003)
+- Documentation & DX → Deferred (ADR-004)
+
+🚧 **Next**: Phase 3 (see `docs/roadmap.md`)
+
+---
+
+## Historical Completed Tasks (2025-07-01 - 2025-07-08)
+
+### Initial Implementation ✅
+- Integration tests added and fixed (search_entries, list_tags, get_statistics, analyze_tag_cooccurrence)
+- Implementation fixes (JSON/plain text processing)
+- Debug logging cleanup and proper stderr output
+- Code formatting and linting
+- Global installation via npm link
+- All tests passing
 
 ### Resolved Issue ✅
-**Claude Desktop接続エラー (2025-07-07)**
-- 症状: Claude Desktop起動時に "MCP jrnl:write EPIPE" エラー
-- 原因: グローバルインストールされた`jrnl-mcp`のシェバング行が`#!/usr/bin/env node`を使用していたが、Claude DesktopのPATH環境変数にNode.jsが含まれていなかった
-- 解決策: シェバング行をNode.jsの絶対パスに変更（環境依存の一時的な修正）
-- 注意: この修正は環境依存なので、将来的にはClaude DesktopのPATH設定改善が望ましい
+**Claude Desktop Connection Error (2025-07-07)**
+- Symptom: "MCP jrnl:write EPIPE" error on Claude Desktop startup
+- Cause: Global `jrnl-mcp` used `#!/usr/bin/env node` shebang, but Claude Desktop's PATH didn't include Node.js
+- Solution: Changed shebang to absolute Node.js path (environment-specific temporary fix)
+- Note: This is environment-dependent; ideally Claude Desktop's PATH should be improved
 
 ### File Locations
 - Global command: `<npm-global-bin>/jrnl-mcp` (e.g., /opt/homebrew/bin/jrnl-mcp on macOS with Homebrew)

@@ -283,6 +283,66 @@ describe("jrnl MCP Server Integration Tests", () => {
           done();
         });
       });
+
+      it("should respect limit parameter", (done) => {
+        const request = {
+          jsonrpc: "2.0",
+          id: 20,
+          method: "tools/call",
+          params: {
+            name: "search_entries",
+            arguments: {
+              limit: 2,
+            },
+          },
+        };
+
+        serverProcess.stdin?.write(JSON.stringify(request) + "\n");
+
+        serverProcess.stdout?.once("data", (data) => {
+          const response = JSON.parse(data.toString().trim());
+          expect(response.result.content).toBeDefined();
+
+          const result = JSON.parse(response.result.content[0].text);
+          expect(result.entries).toBeDefined();
+          expect(result.entries.length).toBeLessThanOrEqual(2);
+
+          done();
+        });
+      });
+
+      it("should filter starred entries when starred=true", (done) => {
+        const request = {
+          jsonrpc: "2.0",
+          id: 21,
+          method: "tools/call",
+          params: {
+            name: "search_entries",
+            arguments: {
+              starred: true,
+            },
+          },
+        };
+
+        serverProcess.stdin?.write(JSON.stringify(request) + "\n");
+
+        serverProcess.stdout?.once("data", (data) => {
+          const response = JSON.parse(data.toString().trim());
+          expect(response.result.content).toBeDefined();
+
+          const result = JSON.parse(response.result.content[0].text);
+          expect(result.entries).toBeDefined();
+          expect(Array.isArray(result.entries)).toBe(true);
+          // All returned entries should be starred (if any exist)
+          if (result.entries.length > 0) {
+            expect(
+              result.entries.every((entry: any) => entry.starred === true),
+            ).toBe(true);
+          }
+
+          done();
+        });
+      });
     });
 
     describe("list_tags tool", () => {
@@ -340,6 +400,129 @@ describe("jrnl MCP Server Integration Tests", () => {
           expect(result.statistics.averageWordsPerEntry).toBeGreaterThanOrEqual(
             0,
           );
+
+          done();
+        });
+      });
+
+      it("should include top tags when includeTopTags is true", (done) => {
+        const request = {
+          jsonrpc: "2.0",
+          id: 22,
+          method: "tools/call",
+          params: {
+            name: "get_statistics",
+            arguments: {
+              includeTopTags: true,
+            },
+          },
+        };
+
+        serverProcess.stdin?.write(JSON.stringify(request) + "\n");
+
+        serverProcess.stdout?.once("data", (data) => {
+          const response = JSON.parse(data.toString().trim());
+          expect(response.result.content).toBeDefined();
+
+          const result = JSON.parse(response.result.content[0].text);
+          expect(result.statistics).toBeDefined();
+          expect(result.statistics.topTags).toBeDefined();
+          expect(Array.isArray(result.statistics.topTags)).toBe(true);
+
+          done();
+        });
+      });
+
+      it("should exclude top tags when includeTopTags is false", (done) => {
+        const request = {
+          jsonrpc: "2.0",
+          id: 23,
+          method: "tools/call",
+          params: {
+            name: "get_statistics",
+            arguments: {
+              includeTopTags: false,
+            },
+          },
+        };
+
+        serverProcess.stdin?.write(JSON.stringify(request) + "\n");
+
+        serverProcess.stdout?.once("data", (data) => {
+          const response = JSON.parse(data.toString().trim());
+          expect(response.result.content).toBeDefined();
+
+          const result = JSON.parse(response.result.content[0].text);
+          expect(result.statistics).toBeDefined();
+          expect(result.statistics.topTags).toBeUndefined();
+
+          done();
+        });
+      });
+
+      it("should group by month when timeGrouping is month", (done) => {
+        const request = {
+          jsonrpc: "2.0",
+          id: 24,
+          method: "tools/call",
+          params: {
+            name: "get_statistics",
+            arguments: {
+              timeGrouping: "month",
+            },
+          },
+        };
+
+        serverProcess.stdin?.write(JSON.stringify(request) + "\n");
+
+        serverProcess.stdout?.once("data", (data) => {
+          const response = JSON.parse(data.toString().trim());
+          expect(response.result.content).toBeDefined();
+
+          const result = JSON.parse(response.result.content[0].text);
+          expect(result.statistics).toBeDefined();
+          expect(result.statistics.timeGrouping).toBeDefined();
+          expect(Array.isArray(result.statistics.timeGrouping)).toBe(true);
+
+          // Check that periods are in YYYY-MM format
+          if (result.statistics.timeGrouping.length > 0) {
+            const period = result.statistics.timeGrouping[0].period;
+            expect(period).toMatch(/^\d{4}-\d{2}$/);
+          }
+
+          done();
+        });
+      });
+
+      it("should group by year when timeGrouping is year", (done) => {
+        const request = {
+          jsonrpc: "2.0",
+          id: 25,
+          method: "tools/call",
+          params: {
+            name: "get_statistics",
+            arguments: {
+              timeGrouping: "year",
+            },
+          },
+        };
+
+        serverProcess.stdin?.write(JSON.stringify(request) + "\n");
+
+        serverProcess.stdout?.once("data", (data) => {
+          const response = JSON.parse(data.toString().trim());
+          expect(response.result.content).toBeDefined();
+
+          const result = JSON.parse(response.result.content[0].text);
+          expect(result.statistics).toBeDefined();
+          expect(result.statistics.timeGrouping).toBeDefined();
+          expect(Array.isArray(result.statistics.timeGrouping)).toBe(true);
+
+          // Check that periods are in YYYY format
+          if (result.statistics.timeGrouping.length > 0) {
+            const period = result.statistics.timeGrouping[0].period;
+            expect(period).toMatch(/^\d{4}$/);
+          }
 
           done();
         });
