@@ -23,6 +23,56 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## Git Workflow - MUST READ
+
+**CRITICAL**: The `main` branch is protected. Direct pushes are blocked.
+
+### Before ANY Git Operation
+
+```bash
+git branch  # Always check current branch first
+```
+
+### Required Workflow
+
+```
+develop (work here) → PR → main (protected)
+```
+
+1. **Always work on `develop` branch**
+   ```bash
+   git checkout develop
+   ```
+
+2. **Commit and push to develop**
+   ```bash
+   git add <files>
+   git commit -m "message"
+   git push origin develop
+   ```
+
+3. **Create PR to merge into main**
+   ```bash
+   gh pr create --base main --head develop
+   ```
+
+4. **Never commit directly to main** - It will be rejected by branch protection rules.
+
+### If You Accidentally Commit to Main
+
+```bash
+# Cherry-pick to develop
+git checkout develop
+git cherry-pick <commit-hash>
+git push origin develop
+
+# Reset main to remote
+git checkout main
+git reset --hard origin/main
+```
+
+---
+
 ## Project Overview
 
 This is a jrnl MCP (Model Context Protocol) server that provides a read-only API for AI assistants to access and analyze journal entries from the jrnl command-line tool.
