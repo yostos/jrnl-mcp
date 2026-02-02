@@ -32,8 +32,23 @@ jobs:
       - name: Setup jrnl config
         run: |
           mkdir -p ~/.config/jrnl
-          echo '{"journals": {"default": {"journal": "/tmp/test.jrnl"}}, "version": "v4"}' > ~/.config/jrnl/jrnl.yaml
-          echo "2024-01-01 10:00 Test entry @test" > /tmp/test.jrnl
+          cat > ~/.config/jrnl/jrnl.yaml << 'YAML'
+          default_hour: 9
+          default_minute: 0
+          editor: ""
+          encrypt: false
+          highlight: true
+          indent_character: "|"
+          linewrap: 79
+          tagsymbols: "@"
+          template: false
+          timeformat: "%F %r"
+          version: v4.2
+          journals:
+            default:
+              journal: /tmp/test.jrnl
+          YAML
+          echo "[2024-01-01 10:00] Test entry @test" > /tmp/test.jrnl
 
       - name: Install dependencies
         run: npm ci
