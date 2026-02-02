@@ -21,40 +21,13 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install jrnl
-        run: pip install jrnl
-
-      - name: Setup jrnl config
-        run: |
-          mkdir -p ~/.config/jrnl
-          cat > ~/.config/jrnl/jrnl.yaml << 'YAML'
-          default_hour: 9
-          default_minute: 0
-          editor: ""
-          encrypt: false
-          highlight: true
-          indent_character: "|"
-          linewrap: 79
-          tagsymbols: "@"
-          template: false
-          timeformat: "%F %r"
-          version: v4.2
-          journals:
-            default:
-              journal: /tmp/test.jrnl
-          YAML
-          echo "[2024-01-01 10:00] Test entry @test" > /tmp/test.jrnl
-
       - name: Install dependencies
         run: npm ci
 
       - name: Run tests
         run: npm run test:ci
+        env:
+          JRNL_MCP_USE_MOCK: 'true'
 
       - name: Publish to npm
         run: npm publish --provenance --access public

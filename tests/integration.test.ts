@@ -51,7 +51,9 @@ describe("jrnl MCP Server Integration Tests", () => {
         expect(response.result.tools).toBeDefined();
         expect(response.result.tools.length).toBe(6);
 
-        const toolNames = response.result.tools.map((t: any) => t.name);
+        const toolNames = response.result.tools.map(
+          (t: { name: string }) => t.name,
+        );
         expect(toolNames).toContain("search_entries");
         expect(toolNames).toContain("list_tags");
         expect(toolNames).toContain("analyze_tag_cooccurrence");
@@ -155,7 +157,7 @@ describe("jrnl MCP Server Integration Tests", () => {
           params: {
             name: "search_entries",
             arguments: {
-              tags: ["@ciac"],
+              tags: ["@work"],
             },
           },
         };
@@ -175,7 +177,9 @@ describe("jrnl MCP Server Integration Tests", () => {
           if (result.entries.length > 0) {
             expect(
               result.entries.every(
-                (entry: any) => entry.tags && entry.tags.includes("@ciac"),
+                (entry: unknown) =>
+                  (entry as { tags?: string[] }).tags &&
+                  (entry as { tags: string[] }).tags.includes("@work"),
               ),
             ).toBe(true);
           }
@@ -192,7 +196,7 @@ describe("jrnl MCP Server Integration Tests", () => {
           params: {
             name: "search_entries",
             arguments: {
-              tags: ["@ciac"],
+              tags: ["@work", "@meeting"],
               tag_mode: "and",
             },
           },
@@ -209,11 +213,13 @@ describe("jrnl MCP Server Integration Tests", () => {
           expect(result.entries).toBeDefined();
           expect(Array.isArray(result.entries)).toBe(true);
           expect(result.tags).toBeDefined();
-          // Check that filtered entries only contain the requested tag
+          // Check that filtered entries contain the requested tags
           if (result.entries.length > 0) {
             expect(
               result.entries.every(
-                (entry: any) => entry.tags && entry.tags.includes("@ciac"),
+                (entry: unknown) =>
+                  (entry as { tags?: string[] }).tags &&
+                  (entry as { tags: string[] }).tags.includes("@work"),
               ),
             ).toBe(true);
           }
@@ -260,7 +266,7 @@ describe("jrnl MCP Server Integration Tests", () => {
             name: "search_entries",
             arguments: {
               from_date: "last month",
-              tags: ["@ciac"],
+              tags: ["@work"],
               text: "meeting",
               limit: 5,
             },
@@ -336,7 +342,9 @@ describe("jrnl MCP Server Integration Tests", () => {
           // All returned entries should be starred (if any exist)
           if (result.entries.length > 0) {
             expect(
-              result.entries.every((entry: any) => entry.starred === true),
+              result.entries.every(
+                (entry: { starred?: boolean }) => entry.starred === true,
+              ),
             ).toBe(true);
           }
 
